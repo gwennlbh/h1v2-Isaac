@@ -4,7 +4,7 @@ from pathlib import Path
 
 import numpy as np
 import yaml
-from biped_assets import SCENE_PATHS
+from source.biped_assets.biped_assets import SCENE_PATHS
 from unitree_sdk2py.core.channel import (
     ChannelFactoryInitialize,
     ChannelPublisher,
@@ -60,7 +60,7 @@ class H12Real:
     )
 
     def __init__(self, config):
-        ChannelFactoryInitialize(0, config["real"]["net_interface"])
+        ChannelFactoryInitialize(1, config["real"]["net_interface"])
 
         self.control_dt = config["control_dt"]
 
@@ -88,7 +88,9 @@ class H12Real:
             if joint["name"] not in self.REAL_JOINT_NAME_ORDER:
                 err_msg = f"Joint '{joint['name']}' is enabled, but cannot be found in the model"
                 raise ConfigError(err_msg)
-            self.enabled_joint_idx.append(self.REAL_JOINT_NAME_ORDER.index(joint["name"]))
+            self.enabled_joint_idx.append(
+                self.REAL_JOINT_NAME_ORDER.index(joint["name"])
+            )
 
         self.remote_controller = RemoteController()
 
@@ -111,10 +113,13 @@ class H12Real:
         self.wait_for_low_state()
 
         self.num_joints_total = len(self.low_cmd.motor_cmd)
+        print(f"Total number of joints: {self.num_joints_total}")
 
         self.init_cmd_hg(self.low_cmd, self.mode_machine_, self.mode_pr_)
 
     def low_state_handler(self, msg: LowStateHG):
+        from rich import print
+
         self.low_state = msg
         self.mode_machine_ = self.low_state.mode_machine
         self.remote_controller.set(self.low_state.wireless_remote)
@@ -134,13 +139,18 @@ class H12Real:
 
     def send_cmd(self, cmd: LowCmdHG):
         cmd.crc = CRC().Crc(cmd)
+        print(f"Sending {[m.q for m in cmd.motor_cmd if m.q > 0]}")
         self.lowcmd_publisher_.Write(cmd)
 
     def get_controller_command(self):
         if self.use_mujoco:
             command = self.unitree.get_controller_command()
         else:
-            command = [self.remote_controller.ly, -self.remote_controller.lx, -self.remote_controller.rx]
+            command = [
+                self.remote_controller.ly,
+                -self.remote_controller.lx,
+                -self.remote_controller.rx,
+            ]
         return np.clip(np.array(command), -1, 1)
 
     def get_robot_state(self):

@@ -2,7 +2,7 @@ import time
 from pathlib import Path
 
 import yaml
-from biped_assets import SCENE_PATHS
+from source.biped_assets.biped_assets import SCENE_PATHS
 from controllers.rl import RLPolicy
 from robots.h12_real import H12Real
 from utils.remote_controller import KeyMap

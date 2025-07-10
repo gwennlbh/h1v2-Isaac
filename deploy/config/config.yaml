@@ -15,8 +15,8 @@ mujoco:
   elastic_band: False
 
 real:
-  net_interface: eth0
-  use_mujoco: True
+  net_interface: lo
+  use_mujoco: false
 
 joints:
   - name: left_hip_yaw
