@@ -139,7 +139,6 @@ class H12Real:
 
     def send_cmd(self, cmd: LowCmdHG):
         cmd.crc = CRC().Crc(cmd)
-        print(f"Sending {[m.q for m in cmd.motor_cmd if m.q > 0]}")
         self.lowcmd_publisher_.Write(cmd)
 
     def get_controller_command(self):
