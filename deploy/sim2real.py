@@ -37,10 +37,10 @@ if __name__ == "__main__":
 
     if not use_mujoco:
         robot.enter_zero_torque_state()
-        robot.wait_for_button(KeyMap.start)
+        # robot.wait_for_button(KeyMap.start)
 
         robot.move_to_default_pos()
-        robot.wait_for_button(KeyMap.A)
+        #  robot.wait_for_button(KeyMap.A)
 
     else:
         robot.set_init_state()
